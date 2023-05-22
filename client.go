@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -303,7 +304,9 @@ func (c *Client) request(ctx context.Context, stream string) (*http.Response, er
 	}
 
 	req.Header.Set("Cache-Control", "no-cache")
-	req.Header.Set("Accept", "text/event-stream")
+	if os.Getenv("DISABLE_SSE_ACCEPT_HEADER") == "true" {
+		req.Header.Set("Accept", "text/event-stream")
+	}
 	req.Header.Set("Connection", "keep-alive")
 
 	lastID, exists := c.LastEventID.Load().([]byte)
